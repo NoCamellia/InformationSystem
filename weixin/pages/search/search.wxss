@@ -1,0 +1,32 @@
+.search-box {
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx;
+  background: #fff;
+  margin-bottom: 20rpx;
+}
+
+.search-input {
+  flex: 1;
+  padding: 20rpx 32rpx;
+  background: #f5f7fa;
+  border-radius: 32rpx;
+  font-size: 28rpx;
+}
+
+.search-btn {
+  padding: 20rpx 40rpx;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+  border-radius: 32rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+.search-btn::after {
+  border: none;
+}
+
+.result-container {
+  padding: 0 20rpx;
+}

@@ -1,0 +1,65 @@
+<view class="container">
+  <!-- 搜索栏 -->
+  <view class="search-bar" bindtap="onSearchTap">
+    <view class="search-input">
+      <text class="search-icon">🔍</text>
+      <text class="search-placeholder">搜索文章</text>
+    </view>
+  </view>
+
+  <!-- 轮播图 -->
+  <swiper class="banner-swiper" indicator-dots indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#fff" autoplay circular>
+    <swiper-item wx:for="{{banners}}" wx:key="id" bindtap="onBannerTap" data-id="{{item.linkId}}">
+      <image class="banner-image" src="{{item.imageUrl}}" mode="aspectFill" />
+      <view class="banner-title">{{item.title}}</view>
+    </swiper-item>
+  </swiper>
+
+  <!-- 热门文章 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">🔥 热门推荐</text>
+    </view>
+    <scroll-view class="hot-scroll" scroll-x>
+      <view class="hot-list">
+        <view class="hot-item" wx:for="{{hotArticles}}" wx:key="id" bindtap="onArticleTap" data-id="{{item.id}}">
+          <image class="hot-image" src="{{item.coverImage}}" mode="aspectFill" />
+          <view class="hot-title">{{item.title}}</view>
+          <view class="hot-meta">
+            <text>👁 {{formatCount(item.viewCount)}}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 推荐文章 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">📰 推荐阅读</text>
+    </view>
+    <view class="article-list">
+      <view class="article-card" wx:for="{{recommendArticles}}" wx:key="id" bindtap="onArticleTap" data-id="{{item.id}}">
+        <image class="article-image" src="{{item.coverImage}}" mode="aspectFill" />
+        <view class="article-content">
+          <view class="article-title">{{item.title}}</view>
+          <view class="article-summary">{{item.summary}}</view>
+          <view class="article-meta">
+            <view class="article-meta-left">
+              <view class="article-meta-item">
+                <text>👁 {{formatCount(item.viewCount)}}</text>
+              </view>
+              <view class="article-meta-item">
+                <text>👍 {{formatCount(item.likeCount)}}</text>
+              </view>
+            </view>
+            <text>{{timeAgo(item.publishTime)}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="loading-more" wx:if="{{loading}}">加载中...</view>
+    <view class="loading-more" wx:if="{{!hasMore && recommendArticles.length > 0}}">没有更多了</view>
+  </view>
+</view>

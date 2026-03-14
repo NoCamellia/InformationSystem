@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="category-container">
+    <!-- 左侧分类列表 -->
+    <scroll-view class="category-sidebar" scroll-y>
+      <view 
+        class="category-item {{currentCategory === item.id ? 'active' : ''}}"
+        wx:for="{{categories}}" 
+        wx:key="id"
+        bindtap="onCategoryTap"
+        data-id="{{item.id}}"
+      >
+        <text>{{item.categoryName}}</text>
+      </view>
+    </scroll-view>
+
+    <!-- 右侧文章列表 -->
+    <scroll-view class="article-container" scroll-y>
+      <view class="article-list">
+        <view 
+          class="article-item"
+          wx:for="{{articles}}" 
+          wx:key="id"
+          bindtap="onArticleTap"
+          data-id="{{item.id}}"
+        >
+          <image class="article-thumb" src="{{item.coverImage}}" mode="aspectFill" />
+          <view class="article-info">
+            <view class="article-title">{{item.title}}</view>
+            <view class="article-summary">{{item.summary}}</view>
+            <view class="article-meta">
+              <text>👁 {{item.viewCount}}</text>
+              <text>👍 {{item.likeCount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="loading-more" wx:if="{{loading}}">加载中...</view>
+      <view class="loading-more" wx:if="{{!hasMore && articles.length > 0}}">没有更多了</view>
+      <view class="empty-state" wx:if="{{!loading && articles.length === 0}}">
+        <view class="empty-icon">📭</view>
+        <view class="empty-text">暂无文章</view>
+      </view>
+    </scroll-view>
+  </view>
+</view>

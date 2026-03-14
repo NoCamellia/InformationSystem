@@ -1,0 +1,56 @@
+<view class="container" wx:if="{{!loading && article}}">
+  <!-- 文章头部 -->
+  <view class="article-header">
+    <view class="article-title">{{article.title}}</view>
+    <view class="article-info">
+      <view class="article-author">
+        <text>✍️ {{article.authorName}}</text>
+      </view>
+      <view class="article-time">
+        <text>🕐 {{timeAgo(article.publishTime)}}</text>
+      </view>
+    </view>
+    <view class="article-stats">
+      <view class="stat-item">
+        <text>👁 {{formatCount(article.viewCount)}}</text>
+      </view>
+      <view class="stat-item">
+        <text>👍 {{formatCount(article.likeCount)}}</text>
+      </view>
+      <view class="stat-item">
+        <text>⭐ {{formatCount(article.collectCount)}}</text>
+      </view>
+      <view class="stat-item">
+        <text>🔗 {{formatCount(article.shareCount)}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 封面图 -->
+  <image class="cover-image" src="{{article.coverImage}}" mode="widthFix" wx:if="{{article.coverImage}}" />
+
+  <!-- 文章内容 -->
+  <view class="article-body">
+    <rich-text nodes="{{article.content}}" />
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="action-bar">
+    <view class="action-item" bindtap="onLikeTap">
+      <text class="action-icon {{isLiked ? 'active' : ''}}">👍</text>
+      <text class="action-text">{{isLiked ? '已赞' : '点赞'}}</text>
+    </view>
+    <view class="action-item" bindtap="onCollectTap">
+      <text class="action-icon {{isCollected ? 'active' : ''}}">⭐</text>
+      <text class="action-text">{{isCollected ? '已藏' : '收藏'}}</text>
+    </view>
+    <button class="action-item share-btn" open-type="share" bindtap="onShareTap">
+      <text class="action-icon">🔗</text>
+      <text class="action-text">分享</text>
+    </button>
+  </view>
+</view>
+
+<view class="loading-container" wx:if="{{loading}}">
+  <view class="loading-text">加载中...</view>
+</view>
