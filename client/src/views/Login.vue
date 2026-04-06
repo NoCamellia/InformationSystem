@@ -47,6 +47,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { adminLogin } from '@/api/auth'
 
 const router = useRouter()
 const loginFormRef = ref(null)
@@ -63,15 +64,20 @@ const rules = {
 }
 
 const handleLogin = () => {
-  loginFormRef.value.validate((valid) => {
+  loginFormRef.value.validate(async (valid) => {
     if (valid) {
       loading.value = true
-      setTimeout(() => {
-        localStorage.setItem('token', 'mock-token-' + Date.now())
+      try {
+        const res = await adminLogin(loginForm)
+        localStorage.setItem('token', res.token)
+        localStorage.setItem('adminInfo', JSON.stringify(res))
         ElMessage.success('登录成功')
         router.push('/')
+      } catch (error) {
+        ElMessage.error(error.message || '登录失败')
+      } finally {
         loading.value = false
-      }, 1000)
+      }
     }
   })
 }

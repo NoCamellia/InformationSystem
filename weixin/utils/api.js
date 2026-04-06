@@ -102,6 +102,68 @@ const shareArticle = (id) => {
   })
 }
 
+// 用户登录
+const userLogin = (code) => {
+  return request({
+    url: '/user/login',
+    method: 'POST',
+    data: { code }
+  })
+}
+
+// 获取用户信息
+const getUserInfo = (userId) => {
+  return request({
+    url: '/user/info',
+    data: { userId }
+  })
+}
+
+// 获取收藏列表
+const getCollectList = (userId) => {
+  return request({
+    url: `/collect/list?userId=${userId}`
+  })
+}
+
+// 检查是否已收藏
+const checkCollected = (userId, articleId) => {
+  return request({
+    url: `/collect/check/${userId}/${articleId}`
+  })
+}
+
+// 添加收藏
+const addCollect = (userId, articleId) => {
+  return request({
+    url: `/collect/add?userId=${userId}&articleId=${articleId}`,
+    method: 'POST'
+  })
+}
+
+// 取消收藏
+const removeCollect = (userId, articleId) => {
+  return request({
+    url: `/collect/remove?userId=${userId}&articleId=${articleId}`,
+    method: 'DELETE'
+  })
+}
+
+// 获取浏览历史
+const getHistoryList = (userId, limit = 20) => {
+  return request({
+    url: `/history/list?userId=${userId}&limit=${limit}`
+  })
+}
+
+// 添加浏览历史
+const addHistory = (userId, articleId) => {
+  return request({
+    url: `/history/add?userId=${userId}&articleId=${articleId}`,
+    method: 'POST'
+  })
+}
+
 module.exports = {
   getBannerList,
   getArticleList,
@@ -111,5 +173,13 @@ module.exports = {
   getCategoryList,
   likeArticle,
   collectArticle,
-  shareArticle
+  shareArticle,
+  userLogin,
+  getUserInfo,
+  getCollectList,
+  checkCollected,
+  addCollect,
+  removeCollect,
+  getHistoryList,
+  addHistory
 }

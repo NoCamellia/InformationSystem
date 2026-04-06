@@ -4,6 +4,8 @@ Page({
   data: {
     categories: [],
     currentCategory: null,
+    currentCategoryName: '',
+    childCategories: [],
     articles: [],
     loading: false,
     page: 1,
@@ -30,13 +32,27 @@ Page({
 
   onCategoryTap(e) {
     const { id } = e.currentTarget.dataset
+    const currentItem = this.data.categories.find(item => item.id === id)
     this.setData({
       currentCategory: id,
+      currentCategoryName: currentItem ? currentItem.categoryName : '',
       page: 1,
       articles: [],
       hasMore: true
     })
+    this.loadChildCategories(id)
     this.loadArticles(id)
+  },
+
+  loadChildCategories(categoryId) {
+    api.getCategoryList(categoryId).then(res => {
+      this.setData({
+        childCategories: res || []
+      })
+    }).catch(err => {
+      console.error('加载子分类失败', err)
+      this.setData({ childCategories: [] })
+    })
   },
 
   loadArticles(categoryId) {
@@ -46,6 +62,7 @@ Page({
     
     api.getArticleList({
       categoryId,
+      includeChildren: true,
       current: this.data.page,
       size: this.data.pageSize
     }).then(res => {

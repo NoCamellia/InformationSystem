@@ -118,6 +118,7 @@ const handleSubmit = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
       try {
+        form.level = form.parentId === 0 ? 1 : 2
         if (form.id) {
           await updateCategory(form)
         } else {

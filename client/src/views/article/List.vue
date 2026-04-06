@@ -15,9 +15,12 @@
           clearable
         >
           <el-option label="全部分类" :value="null" />
-          <el-option label="新闻" :value="1" />
-          <el-option label="科技" :value="5" />
-          <el-option label="财经" :value="9" />
+          <el-option
+            v-for="item in categoryOptions"
+            :key="item.id"
+            :label="item.categoryName"
+            :value="item.id"
+          />
         </el-select>
         <el-select 
           v-model="searchForm.status" 
@@ -80,10 +83,12 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getArticleList, deleteArticle, publishArticle } from '@/api/article'
+import { getCategoryList } from '@/api/category'
 
 const router = useRouter()
 const loading = ref(false)
 const tableData = ref([])
+const categoryOptions = ref([])
 
 const searchForm = reactive({
   keyword: '',
@@ -98,8 +103,17 @@ const pagination = reactive({
 })
 
 const getCategoryName = (id) => {
-  const map = { 1: '新闻', 2: '国内', 3: '国际', 5: '科技', 9: '财经' }
-  return map[id] || '其他'
+  const category = categoryOptions.value.find(item => item.id === id)
+  return category ? category.categoryName : '未分类'
+}
+
+const fetchCategories = async () => {
+  try {
+    const res = await getCategoryList()
+    categoryOptions.value = res.data
+  } catch (error) {
+    ElMessage.error('获取分类失败')
+  }
 }
 
 const fetchData = async () => {
@@ -159,6 +173,7 @@ const handleDelete = (row) => {
 }
 
 onMounted(() => {
+  fetchCategories()
   fetchData()
 })
 </script>

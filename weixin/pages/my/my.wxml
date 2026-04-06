@@ -9,9 +9,9 @@
       </view>
     </view>
     <view class="user-info" wx:else>
-      <image class="avatar" src="/images/default-avatar.png" />
+      <view class="avatar-placeholder">👤</view>
       <view class="user-detail">
-        <button class="login-btn" open-type="getUserProfile" bindgetuserinfo="onGetUserInfo">
+        <button class="login-btn" bindtap="onGetUserInfo">
           点击登录
         </button>
       </view>

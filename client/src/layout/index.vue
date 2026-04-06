@@ -35,7 +35,7 @@
             <el-dropdown @command="handleCommand">
               <span class="user-info">
                 <el-avatar :size="35" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-                <span class="username">管理员</span>
+                <span class="username">{{ adminInfo?.realName || adminInfo?.username || '管理员' }}</span>
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -62,6 +62,11 @@ import { ElMessage } from 'element-plus'
 const router = useRouter()
 const route = useRoute()
 
+const adminInfo = computed(() => {
+  const raw = localStorage.getItem('adminInfo')
+  return raw ? JSON.parse(raw) : null
+})
+
 const menuRoutes = computed(() => {
   const routes = router.getRoutes()
   return routes.find(r => r.path === '/')?.children?.filter(r => !r.meta?.hidden) || []
@@ -78,6 +83,7 @@ const currentRoute = computed(() => {
 const handleCommand = (command) => {
   if (command === 'logout') {
     localStorage.removeItem('token')
+    localStorage.removeItem('adminInfo')
     ElMessage.success('退出成功')
     router.push('/login')
   }

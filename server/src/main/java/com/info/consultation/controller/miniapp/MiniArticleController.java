@@ -7,6 +7,7 @@ import com.info.consultation.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -16,13 +17,28 @@ public class MiniArticleController {
     @Autowired
     private ArticleService articleService;
     
+    @Autowired
+    private com.info.consultation.service.CategoryService categoryService;
+    
     @GetMapping("/list")
     public Result<PageResult<Article>> getArticleList(
             @RequestParam(defaultValue = "1") Integer current,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Long categoryId) {
-        PageResult<Article> result = articleService.getArticleList(current, size, keyword, categoryId, 1);
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(defaultValue = "false") Boolean includeChildren) {
+        List<Long> categoryIds = null;
+        if (categoryId != null) {
+            categoryIds = new ArrayList<>();
+            categoryIds.add(categoryId);
+            if (Boolean.TRUE.equals(includeChildren)) {
+                List<com.info.consultation.entity.Category> childCategories = categoryService.getCategoryByParentId(categoryId);
+                for (com.info.consultation.entity.Category category : childCategories) {
+                    categoryIds.add(category.getId());
+                }
+            }
+        }
+        PageResult<Article> result = articleService.getArticleListByCategoryIds(current, size, keyword, categoryIds, 1);
         return Result.success(result);
     }
     

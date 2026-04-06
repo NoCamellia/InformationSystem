@@ -18,6 +18,7 @@ App({
     return new Promise((resolve, reject) => {
       wx.login({
         success: (res) => {
+          console.log('wx.login success:', res)
           if (res.code) {
             // 发送 res.code 到后台换取 openId, sessionKey, unionId
             wx.request({
@@ -26,23 +27,35 @@ App({
               data: {
                 code: res.code
               },
+              header: {
+                'content-type': 'application/json'
+              },
               success: (result) => {
-                if (result.data.code === 200) {
+                console.log('login request success:', result)
+                if (result.data && result.data.code === 200) {
                   const token = result.data.data.token
+                  const userId = result.data.data.userId
                   wx.setStorageSync('token', token)
+                  wx.setStorageSync('userId', userId)
                   this.globalData.token = token
                   resolve(result.data.data)
                 } else {
-                  reject(result.data.message)
+                  reject(result.data?.message || '登录失败')
                 }
               },
-              fail: reject
+              fail: (err) => {
+                console.error('login request fail:', err)
+                reject(err)
+              }
             })
           } else {
             reject('登录失败：' + res.errMsg)
           }
         },
-        fail: reject
+        fail: (err) => {
+          console.error('wx.login fail:', err)
+          reject(err)
+        }
       })
     })
   },

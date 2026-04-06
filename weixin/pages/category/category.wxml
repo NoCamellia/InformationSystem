@@ -15,6 +15,15 @@
 
     <!-- 右侧文章列表 -->
     <scroll-view class="article-container" scroll-y>
+      <view class="category-header" wx:if="{{currentCategoryName}}">
+        <view class="category-title">{{currentCategoryName}}</view>
+        <view class="child-category-list" wx:if="{{childCategories.length > 0}}">
+          <view class="child-category-tag" wx:for="{{childCategories}}" wx:key="id">
+            {{item.categoryName}}
+          </view>
+        </view>
+      </view>
+
       <view class="article-list">
         <view 
           class="article-item"

@@ -1,12 +1,57 @@
+const api = require('../../utils/api')
+
 Page({
   data: {
-    articles: []
+    articles: [],
+    loading: true,
+    userId: null
   },
 
   onLoad() {
-    // 模拟历史数据
-    this.setData({
-      articles: []
+    const userId = wx.getStorageSync('userId')
+    this.setData({ userId })
+    
+    if (userId) {
+      this.loadHistoryList(userId)
+    } else {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'none'
+      })
+      this.setData({ loading: false })
+    }
+  },
+
+  onShow() {
+    const userId = wx.getStorageSync('userId')
+    if (userId) {
+      this.loadHistoryList(userId)
+    }
+  },
+
+  loadHistoryList(userId) {
+    this.setData({ loading: true })
+    
+    api.getHistoryList(userId, 50).then(res => {
+      console.log('浏览历史:', res)
+      this.setData({
+        articles: res || [],
+        loading: false
+      })
+      
+      if (!res || res.length === 0) {
+        wx.showToast({
+          title: '还没有浏览任何文章',
+          icon: 'none'
+        })
+      }
+    }).catch(err => {
+      console.error('获取浏览历史失败', err)
+      this.setData({ loading: false })
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
     })
   },
 

@@ -2,7 +2,17 @@
   <div class="tag-page">
     <el-card>
       <div class="toolbar">
-        <el-button type="primary" @click="handleAdd">新增标签</el-button>
+        <el-input
+          v-model="searchForm.keyword"
+          placeholder="搜索标签名称"
+          clearable
+          style="width: 260px"
+          @keyup.enter="handleSearch"
+        />
+        <div class="toolbar-actions">
+          <el-button @click="handleSearch">搜索</el-button>
+          <el-button type="primary" @click="handleAdd">新增标签</el-button>
+        </div>
       </div>
 
       <el-table :data="tableData" style="width: 100%; margin-top: 20px;" v-loading="loading">
@@ -10,7 +20,7 @@
         <el-table-column prop="tagName" label="标签名称" />
         <el-table-column prop="color" label="颜色" width="150">
           <template #default="{ row }">
-            <el-tag :color="row.color" style="border: none;">{{ row.tagName }}</el-tag>
+            <el-tag :color="row.color" style="border: none; color: #fff;">{{ row.tagName }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="useCount" label="使用次数" width="120" />
@@ -27,6 +37,17 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <el-pagination
+        v-model:current-page="pagination.current"
+        v-model:page-size="pagination.size"
+        :total="pagination.total"
+        :page-sizes="[10, 20, 50]"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSearch"
+        @current-change="fetchData"
+        style="margin-top: 20px; justify-content: flex-end;"
+      />
     </el-card>
 
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px">
@@ -52,23 +73,29 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getTagList, addTag, updateTag, deleteTag } from '@/api/tag'
 
 const loading = ref(false)
-const tableData = ref([
-  { id: 1, tagName: '热点', color: '#ff4d4f', useCount: 15, status: 1 },
-  { id: 2, tagName: '推荐', color: '#1890ff', useCount: 20, status: 1 },
-  { id: 3, tagName: '原创', color: '#52c41a', useCount: 10, status: 1 },
-  { id: 4, tagName: '深度', color: '#722ed1', useCount: 8, status: 1 },
-  { id: 5, tagName: '独家', color: '#fa8c16', useCount: 5, status: 1 }
-])
+const tableData = ref([])
 const dialogVisible = ref(false)
 const dialogTitle = ref('新增标签')
 const formRef = ref(null)
+
+const searchForm = reactive({
+  keyword: ''
+})
+
+const pagination = reactive({
+  current: 1,
+  size: 10,
+  total: 0
+})
 
 const form = reactive({
   id: null,
   tagName: '',
   color: '#1890ff',
+  useCount: 0,
   status: 1
 })
 
@@ -78,34 +105,63 @@ const rules = {
 
 const fetchData = async () => {
   loading.value = true
-  setTimeout(() => {
+  try {
+    const res = await getTagList({
+      current: pagination.current,
+      size: pagination.size,
+      keyword: searchForm.keyword
+    })
+    tableData.value = res.data.records
+    pagination.total = res.data.total
+  } catch (error) {
+    ElMessage.error('获取标签失败')
+  } finally {
     loading.value = false
-  }, 500)
+  }
 }
 
-const handleAdd = () => {
-  dialogTitle.value = '新增标签'
+const handleSearch = () => {
+  pagination.current = 1
+  fetchData()
+}
+
+const resetForm = () => {
   Object.assign(form, {
     id: null,
     tagName: '',
     color: '#1890ff',
+    useCount: 0,
     status: 1
   })
+}
+
+const handleAdd = () => {
+  dialogTitle.value = '新增标签'
+  resetForm()
   dialogVisible.value = true
 }
 
 const handleEdit = (row) => {
   dialogTitle.value = '编辑标签'
-  Object.assign(form, row)
+  Object.assign(form, { ...row })
   dialogVisible.value = true
 }
 
 const handleSubmit = () => {
-  formRef.value.validate((valid) => {
+  formRef.value.validate(async (valid) => {
     if (valid) {
-      ElMessage.success('操作成功')
-      dialogVisible.value = false
-      fetchData()
+      try {
+        if (form.id) {
+          await updateTag(form)
+        } else {
+          await addTag(form)
+        }
+        ElMessage.success('操作成功')
+        dialogVisible.value = false
+        fetchData()
+      } catch (error) {
+        ElMessage.error(error.message || '操作失败')
+      }
     }
   })
 }
@@ -115,9 +171,14 @@ const handleDelete = (row) => {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(() => {
-    ElMessage.success('删除成功')
-    fetchData()
+  }).then(async () => {
+    try {
+      await deleteTag(row.id)
+      ElMessage.success('删除成功')
+      fetchData()
+    } catch (error) {
+      ElMessage.error(error.message || '删除失败')
+    }
   })
 }
 
@@ -138,6 +199,13 @@ onMounted(() => {
 
 .toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 10px;
 }
 </style>

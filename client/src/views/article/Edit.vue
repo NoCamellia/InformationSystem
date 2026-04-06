@@ -28,10 +28,12 @@
 
         <el-form-item label="文章分类" prop="categoryId">
           <el-select v-model="form.categoryId" placeholder="请选择分类">
-            <el-option label="新闻" :value="1" />
-            <el-option label="国内" :value="2" />
-            <el-option label="科技" :value="5" />
-            <el-option label="财经" :value="9" />
+            <el-option
+              v-for="item in categoryOptions"
+              :key="item.id"
+              :label="item.categoryName"
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
 
@@ -79,11 +81,13 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getArticleDetail, addArticle, updateArticle } from '@/api/article'
+import { getCategoryList } from '@/api/category'
 
 const router = useRouter()
 const route = useRoute()
 const formRef = ref(null)
 const isEdit = ref(false)
+const categoryOptions = ref([])
 
 const form = reactive({
   title: '',
@@ -107,10 +111,19 @@ const rules = {
   categoryId: [{ required: true, message: '请选择分类', trigger: 'change' }]
 }
 
+const fetchCategories = async () => {
+  try {
+    const res = await getCategoryList()
+    categoryOptions.value = res
+  } catch (error) {
+    ElMessage.error('获取分类失败')
+  }
+}
+
 const fetchDetail = async () => {
   try {
     const res = await getArticleDetail(route.params.id)
-    Object.assign(form, res.data)
+    Object.assign(form, res)
   } catch (error) {
     ElMessage.error('获取文章详情失败')
   }
@@ -139,7 +152,8 @@ const goBack = () => {
   router.back()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchCategories()
   if (route.params.id) {
     isEdit.value = true
     fetchDetail()

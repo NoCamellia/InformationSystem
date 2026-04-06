@@ -19,6 +19,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     
     @Override
     public PageResult<Article> getArticleList(Integer current, Integer size, String keyword, Long categoryId, Integer status) {
+        List<Long> categoryIds = categoryId == null ? null : List.of(categoryId);
+        return getArticleListByCategoryIds(current, size, keyword, categoryIds, status);
+    }
+    
+    @Override
+    public PageResult<Article> getArticleListByCategoryIds(Integer current, Integer size, String keyword, List<Long> categoryIds, Integer status) {
         Page<Article> page = new Page<>(current, size);
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         
@@ -28,8 +34,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                    .like(Article::getSummary, keyword);
         }
         
-        if (categoryId != null) {
-            wrapper.eq(Article::getCategoryId, categoryId);
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            wrapper.in(Article::getCategoryId, categoryIds);
         }
         
         if (status != null) {
