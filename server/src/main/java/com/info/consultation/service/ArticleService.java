@@ -3,6 +3,7 @@ package com.info.consultation.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.info.consultation.entity.Article;
 import com.info.consultation.common.PageResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +18,12 @@ public interface ArticleService extends IService<Article> {
     List<Article> getHotArticles(Integer limit);
     
     List<Article> getRecommendArticles(Integer limit);
+    
+    @Transactional
+    boolean saveArticle(Article article);
+    
+    @Transactional
+    boolean updateArticle(Article article);
     
     boolean publishArticle(Long id);
     

@@ -25,6 +25,9 @@
         <view class="hot-item" wx:for="{{hotArticles}}" wx:key="id" bindtap="onArticleTap" data-id="{{item.id}}">
           <image class="hot-image" src="{{item.coverImage}}" mode="aspectFill" />
           <view class="hot-title">{{item.title}}</view>
+          <view class="card-tags" wx:if="{{item.tags && item.tags.length}}">
+            <view class="card-tag" wx:for="{{item.tags}}" wx:key="id" wx:for-item="tag"># {{tag.tagName}}</view>
+          </view>
           <view class="hot-meta">
             <text>👁 {{formatCount(item.viewCount)}}</text>
           </view>
@@ -43,6 +46,9 @@
         <image class="article-image" src="{{item.coverImage}}" mode="aspectFill" />
         <view class="article-content">
           <view class="article-title">{{item.title}}</view>
+          <view class="card-tags" wx:if="{{item.tags && item.tags.length}}">
+            <view class="card-tag" wx:for="{{item.tags}}" wx:key="id" wx:for-item="tag"># {{tag.tagName}}</view>
+          </view>
           <view class="article-summary">{{item.summary}}</view>
           <view class="article-meta">
             <view class="article-meta-left">

@@ -110,7 +110,7 @@ const getCategoryName = (id) => {
 const fetchCategories = async () => {
   try {
     const res = await getCategoryList()
-    categoryOptions.value = res.data
+    categoryOptions.value = res.data || []
   } catch (error) {
     ElMessage.error('获取分类失败')
   }

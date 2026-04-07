@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @TableName("article")
@@ -46,6 +47,12 @@ public class Article implements Serializable {
     private Integer isRecommend;
     
     private Integer status;
+    
+    @TableField(exist = false)
+    private List<Tag> tags;
+    
+    @TableField(exist = false)
+    private List<Long> tagIds;
     
     private LocalDateTime publishTime;
     

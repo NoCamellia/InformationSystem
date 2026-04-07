@@ -31,6 +31,21 @@
   color: #999;
 }
 
+.article-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 24rpx;
+}
+
+.article-tag {
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  border: 1rpx solid;
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
 .cover-image {
   width: 100%;
   display: block;

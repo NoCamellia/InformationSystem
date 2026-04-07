@@ -108,6 +108,22 @@
   color: #999;
 }
 
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  padding: 0 20rpx 16rpx;
+}
+
+.card-tag {
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: #eef2ff;
+  color: #5b5bd6;
+  font-size: 20rpx;
+  line-height: 1.2;
+}
+
 .article-list {
   padding: 0 20rpx;
 }

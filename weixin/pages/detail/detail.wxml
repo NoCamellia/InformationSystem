@@ -24,6 +24,11 @@
         <text>🔗 {{formatCount(article.shareCount)}}</text>
       </view>
     </view>
+    <view class="article-tags" wx:if="{{article.tags && article.tags.length}}">
+      <view class="article-tag" wx:for="{{article.tags}}" wx:key="id" style="color: {{item.color}}; border-color: {{item.color}}; background: {{item.color}}22;">
+        # {{item.tagName}}
+      </view>
+    </view>
   </view>
 
   <!-- 封面图 -->

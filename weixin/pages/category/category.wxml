@@ -34,8 +34,13 @@
         >
           <image class="article-thumb" src="{{item.coverImage}}" mode="aspectFill" />
           <view class="article-info">
-            <view class="article-title">{{item.title}}</view>
-            <view class="article-summary">{{item.summary}}</view>
+            <view>
+              <view class="article-title">{{item.title}}</view>
+              <view class="card-tags card-tags-compact" wx:if="{{item.tags && item.tags.length}}">
+                <view class="card-tag" wx:for="{{item.tags}}" wx:key="id" wx:for-item="tag"># {{tag.tagName}}</view>
+              </view>
+              <view class="article-summary">{{item.summary}}</view>
+            </view>
             <view class="article-meta">
               <text>👁 {{item.viewCount}}</text>
               <text>👍 {{item.likeCount}}</text>

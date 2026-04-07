@@ -69,6 +69,26 @@
   border-radius: 999rpx;
 }
 
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin: 14rpx 0;
+}
+
+.card-tags-compact {
+  margin: 10rpx 0 12rpx;
+}
+
+.card-tag {
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  background: #eef2ff;
+  color: #5b5bd6;
+  font-size: 20rpx;
+  line-height: 1.2;
+}
+
 .article-list {
   padding: 20rpx;
 }

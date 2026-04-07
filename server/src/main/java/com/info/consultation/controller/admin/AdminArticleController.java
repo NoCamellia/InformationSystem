@@ -33,13 +33,13 @@ public class AdminArticleController {
     
     @PostMapping("/add")
     public Result<Void> addArticle(@RequestBody Article article) {
-        boolean success = articleService.save(article);
+        boolean success = articleService.saveArticle(article);
         return success ? Result.success() : Result.error("添加失败");
     }
     
     @PutMapping("/update")
     public Result<Void> updateArticle(@RequestBody Article article) {
-        boolean success = articleService.updateById(article);
+        boolean success = articleService.updateArticle(article);
         return success ? Result.success() : Result.error("更新失败");
     }
     

@@ -37,6 +37,17 @@
           </el-select>
         </el-form-item>
 
+        <el-form-item label="文章标签">
+          <el-select v-model="form.tagIds" multiple collapse-tags collapse-tags-tooltip placeholder="请选择标签">
+            <el-option
+              v-for="item in tagOptions"
+              :key="item.id"
+              :label="item.tagName"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="作者" prop="authorName">
           <el-input v-model="form.authorName" placeholder="请输入作者名称" />
         </el-form-item>
@@ -82,12 +93,14 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getArticleDetail, addArticle, updateArticle } from '@/api/article'
 import { getCategoryList } from '@/api/category'
+import { getTagList } from '@/api/tag'
 
 const router = useRouter()
 const route = useRoute()
 const formRef = ref(null)
 const isEdit = ref(false)
 const categoryOptions = ref([])
+const tagOptions = ref([])
 
 const form = reactive({
   title: '',
@@ -95,6 +108,7 @@ const form = reactive({
   coverImage: '',
   content: '',
   categoryId: null,
+  tagIds: [],
   authorId: 1,
   authorName: '系统管理员',
   source: '',
@@ -114,16 +128,26 @@ const rules = {
 const fetchCategories = async () => {
   try {
     const res = await getCategoryList()
-    categoryOptions.value = res
+    categoryOptions.value = (res.data || []).filter(item => item.level === 2)
   } catch (error) {
     ElMessage.error('获取分类失败')
+  }
+}
+
+const fetchTags = async () => {
+  try {
+    const res = await getTagList({ current: 1, size: 1000 })
+    tagOptions.value = (res.data?.records || []).filter(item => item.status === 1)
+  } catch (error) {
+    ElMessage.error('获取标签失败')
   }
 }
 
 const fetchDetail = async () => {
   try {
     const res = await getArticleDetail(route.params.id)
-    Object.assign(form, res)
+    Object.assign(form, res.data)
+    form.tagIds = (res.data.tags || []).map(item => item.id)
   } catch (error) {
     ElMessage.error('获取文章详情失败')
   }
@@ -153,7 +177,7 @@ const goBack = () => {
 }
 
 onMounted(async () => {
-  await fetchCategories()
+  await Promise.all([fetchCategories(), fetchTags()])
   if (route.params.id) {
     isEdit.value = true
     fetchDetail()

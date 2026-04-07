@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.info.consultation.common.PageResult;
 import com.info.consultation.entity.Article;
 import com.info.consultation.mapper.ArticleMapper;
+import com.info.consultation.mapper.TagMapper;
 import com.info.consultation.service.ArticleService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -16,6 +18,12 @@ import java.util.List;
 
 @Service
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+    
+    private final TagMapper tagMapper;
+    
+    public ArticleServiceImpl(TagMapper tagMapper) {
+        this.tagMapper = tagMapper;
+    }
     
     @Override
     public PageResult<Article> getArticleList(Integer current, Integer size, String keyword, Long categoryId, Integer status) {
@@ -46,12 +54,17 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                .orderByDesc(Article::getPublishTime);
         
         IPage<Article> result = this.page(page, wrapper);
+        result.getRecords().forEach(this::fillArticleTags);
         return new PageResult<>(result.getTotal(), result.getRecords(), result.getCurrent(), result.getSize());
     }
     
     @Override
     public Article getArticleDetail(Long id) {
-        return this.getById(id);
+        Article article = this.getById(id);
+        if (article != null) {
+            fillArticleTags(article);
+        }
+        return article;
     }
     
     @Override
@@ -61,7 +74,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                .eq(Article::getIsHot, 1)
                .orderByDesc(Article::getViewCount)
                .last("LIMIT " + limit);
-        return this.list(wrapper);
+        List<Article> articles = this.list(wrapper);
+        articles.forEach(this::fillArticleTags);
+        return articles;
     }
     
     @Override
@@ -71,7 +86,31 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                .eq(Article::getIsRecommend, 1)
                .orderByDesc(Article::getPublishTime)
                .last("LIMIT " + limit);
-        return this.list(wrapper);
+        List<Article> articles = this.list(wrapper);
+        articles.forEach(this::fillArticleTags);
+        return articles;
+    }
+    
+    @Override
+    @Transactional
+    public boolean saveArticle(Article article) {
+        boolean success = this.save(article);
+        if (!success) {
+            return false;
+        }
+        saveArticleTags(article);
+        return true;
+    }
+    
+    @Override
+    @Transactional
+    public boolean updateArticle(Article article) {
+        boolean success = this.updateById(article);
+        if (!success) {
+            return false;
+        }
+        saveArticleTags(article);
+        return true;
     }
     
     @Override
@@ -121,5 +160,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             return this.updateById(article);
         }
         return false;
+    }
+    
+    private void fillArticleTags(Article article) {
+        article.setTags(tagMapper.selectByArticleId(article.getId()));
+    }
+    
+    private void saveArticleTags(Article article) {
+        baseMapper.deleteArticleTags(article.getId());
+        if (article.getTagIds() == null || article.getTagIds().isEmpty()) {
+            return;
+        }
+        for (Long tagId : article.getTagIds()) {
+            baseMapper.insertArticleTag(article.getId(), tagId);
+        }
     }
 }
